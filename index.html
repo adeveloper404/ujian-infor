@@ -3,36 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ujian Harian Online</title>
+    <title>Ulangan Informatika</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="logo-ipiems.png" type="image/png">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
+        .fade-in {
+            animation: fadeInAnimation 0.5s ease-in forwards;
+        }
+        .scale-in {
+            animation: scaleInAnimation 0.3s ease-out forwards;
+        }
+        @keyframes fadeInAnimation {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleInAnimation {
+            from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        /* Style untuk radio button custom */
+        input[type="radio"]:checked + label {
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: white;
+            border-color: #2563eb; /* border-blue-600 */
+        }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-2xl">
+    <!-- Notifikasi Jawaban Kosong -->
+    <div id="notif-kosong" class="fixed top-5 right-5 bg-red-500 text-white py-2 px-4 rounded-lg shadow-lg z-50 hidden transition-opacity duration-300">
+        Harap isi semua jawaban terlebih dahulu!
+    </div>
 
-        <!-- Halaman Awal: Input Data Siswa -->
-        <div id="halaman-awal" class="bg-white p-8 rounded-xl shadow-lg transition-opacity duration-500">
-            <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900">Ujian Harian Online</h1>
-                <p class="text-gray-500 mt-2">Silakan isi data diri Anda untuk memulai ujian.</p>
-            </div>
-            <form id="form-siswa">
-                <div class="mb-4">
-                    <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
-                    <input type="text" id="nama" name="nama" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Masukkan nama lengkap Anda" required>
+    <!-- Halaman Awal -->
+    <div id="halaman-awal" class="w-full max-w-md mx-auto p-4">
+        <div class="bg-white rounded-xl shadow-xl p-8 text-center fade-in">
+            <img src="logo-ipiems.png" alt="Logo Sekolah" class="w-24 h-24 mx-auto mb-4 object-contain">
+            <h1 class="text-2xl font-bold text-gray-800 mb-2">ULANGAN INFORMATIKA</h1>
+            <p class="text-gray-500 mb-6">Silakan masukkan data diri Anda untuk memulai.</p>
+            <div class="space-y-4 text-left">
+                <div>
+                    <label for="nama" class="block text-sm font-medium text-gray-700 mb-1" >Nama Lengkap</label>
+                    <input type="text" id="nama" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition" placeholder="masukan nama lengkap anda disini">
                 </div>
-                <div class="mb-6">
+                <div>
                     <label for="kelas" class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
-                    <select id="kelas" name="kelas" required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <select id="kelas" name="kelas" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 bg-white">
                         <option value="">-- Pilih Kelas --</option>
                         <option value="X-1">X-1</option>
                         <option value="X-2">X-2</option>
@@ -40,231 +63,642 @@
                         <option value="X-4">X-4</option>
                         <option value="XI-2">XI-2</option>
                         <option value="XII-2">XII-2</option>
-                        <option value="XII-3">XII-3</option>
+                        <option value="XII-4">XII-4</option>
                     </select>
-                    </div>
-                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">Mulai Ujian</button>
-            </form>
-        </div>
-
-        <!-- Halaman Ujian -->
-        <div id="halaman-ujian" class="hidden transition-opacity duration-500">
-            <div class="bg-white p-8 rounded-xl shadow-lg">
-                <div class="flex justify-between items-center border-b pb-4 mb-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">Soal Ujian</h2>
-                        <p id="info-siswa" class="text-sm text-gray-500"></p>
-                    </div>
-                    <div id="timer" class="text-lg font-bold bg-red-100 text-red-700 px-4 py-2 rounded-lg">60:00</div>
                 </div>
+            </div>
+            <button onclick="tampilkanKonfirmasi()" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg mt-6 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition transform hover:scale-105">
+                Mulai Ujian
+            </button>
+        </div>
+    </div>
 
-                <form id="form-ujian">
-                    <!-- Soal 1: Pilihan Ganda -->
-                    <div class="mb-8">
-                        <p class="font-semibold mb-2">1. Siapakah presiden pertama Republik Indonesia?</p>
-                        <div class="space-y-2">
-                            <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="radio" name="soal1" value="A" class="mr-3"> A. Soeharto
-                            </label>
-                            <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="radio" name="soal1" value="B" class="mr-3"> B. Soekarno
-                            </label>
-                            <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="radio" name="soal1" value="C" class="mr-3"> C. B.J. Habibie
-                            </label>
-                            <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="radio" name="soal1" value="D" class="mr-3"> D. Joko Widodo
-                            </label>
-                        </div>
-                    </div>
-
-                    <!-- Soal 2: Isian Singkat -->
-                    <div class="mb-8">
-                        <p class="font-semibold mb-2">2. Apa nama ibukota negara Indonesia?</p>
-                        <input type="text" name="soal2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Jawaban Anda...">
-                    </div>
-
-                    <!-- Soal 3: Pilihan Ganda -->
-                     <div class="mb-8">
-                        <p class="font-semibold mb-2">3. Planet terbesar di tata surya adalah...</p>
-                        <div class="space-y-2">
-                            <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="radio" name="soal3" value="A" class="mr-3"> A. Bumi
-                            </label>
-                            <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="radio" name="soal3" value="B" class="mr-3"> B. Mars
-                            </label>
-                            <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="radio" name="soal3" value="C" class="mr-3"> C. Jupiter
-                            </label>
-                            <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                                <input type="radio" name="soal3" value="D" class="mr-3"> D. Saturnus
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <!-- Soal 4: Isian Singkat -->
-                    <div class="mb-8">
-                        <p class="font-semibold mb-2">4. Lagu kebangsaan Indonesia adalah...</p>
-                        <input type="text" name="soal4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" placeholder="Jawaban Anda...">
-                    </div>
-
-
-                    <button type="submit" id="submit-button" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300">Kirim Jawaban</button>
-                </form>
+    <!-- Halaman Ujian -->
+    <div id="halaman-ujian" class="w-full max-w-4xl mx-auto p-4 hidden">
+        <div class="bg-white rounded-xl shadow-lg">
+            <!-- Header Ujian -->
+            <div class="sticky top-0 bg-white/80 backdrop-blur-sm p-4 border-b border-gray-200 flex justify-between items-center rounded-t-xl z-10">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800">Soal Ujian</h2>
+                    <p id="info-siswa" class="text-sm text-gray-600"></p>
+                </div>
+                <div id="timer" class="text-lg font-bold text-red-500 bg-red-100 px-4 py-2 rounded-lg">
+                    60:00
+                </div>
+            </div>
+            <!-- Kontainer Soal -->
+            <div id="soal-container" class="p-6 md:p-8 space-y-8">
+                <!-- Soal akan dimuat di sini oleh JavaScript -->
+            </div>
+             <!-- Tombol Kirim -->
+            <div class="p-6 md:p-8 border-t border-gray-200 text-center">
+                <button onclick="kirimJawaban()" class="bg-green-600 text-white font-semibold py-3 px-8 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition transform hover:scale-105">
+                    Kirim Jawaban
+                </button>
             </div>
         </div>
+    </div>
 
-        <!-- Halaman Konfirmasi -->
-        <div id="halaman-konfirmasi" class="hidden text-center bg-white p-10 rounded-xl shadow-lg">
-             <h2 class="text-2xl font-bold text-green-600 mb-4">Terima Kasih!</h2>
-             <p id="pesan-konfirmasi" class="text-gray-600">Jawaban Anda telah berhasil dikirim. Silakan tunggu informasi selanjutnya dari guru Anda.</p>
+     <!-- Halaman Konfirmasi Selesai -->
+    <div id="halaman-selesai" class="w-full max-w-md mx-auto p-4 text-center hidden">
+         <!-- Konten akan diisi oleh JavaScript -->
+    </div>
+
+    <!-- Modal Konfirmasi Mulai Ujian -->
+    <div id="konfirmasi-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 hidden transition-opacity duration-300">
+        <div class="bg-white rounded-lg shadow-xl p-6 sm:p-8 max-w-md w-full mx-4 text-center transform transition-all scale-in">
+            <!-- Icon -->
+            <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 mb-4">
+                <svg class="h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-900 mb-3">Anda Akan Memulai Ujian</h2>
+            
+            <p class="text-gray-600 mb-6 px-4">
+                Waktu <strong>60 menit</strong> akan berjalan setelah Anda menekan tombol "Mulai". Pastikan Anda sudah siap.
+            </p>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md mb-8">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                         <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3 text-left">
+                        <p class="text-sm text-yellow-700">
+                            <strong class="font-semibold">PENTING:</strong> Dilarang berpindah halaman/tab atau keluar dari browser. Tindakan tersebut akan <strong class="font-semibold">menghentikan ujian secara otomatis</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row-reverse gap-3">
+                <button onclick="mulaiUjian()" class="w-full sm:w-auto inline-flex justify-center rounded-md bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Ya, Mulai Ujian
+                </button>
+                <button onclick="document.getElementById('konfirmasi-modal').classList.add('hidden')" class="w-full sm:w-auto inline-flex justify-center rounded-md bg-white px-6 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                    Batal
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpoW_XtPuW64cCgF7QHIwm_kOztxAd3I6wYIHnODNO8mQZbnPBdN1Lw89UYCKmbNmvKg/exec'; // GANTI DENGAN URL SCRIPT ANDA
+
         const halamanAwal = document.getElementById('halaman-awal');
         const halamanUjian = document.getElementById('halaman-ujian');
-        const halamanKonfirmasi = document.getElementById('halaman-konfirmasi');
-        
-        const formSiswa = document.getElementById('form-siswa');
-        const formUjian = document.getElementById('form-ujian');
-        
-        const timerEl = document.getElementById('timer');
-        const infoSiswaEl = document.getElementById('info-siswa');
-        const submitButton = document.getElementById('submit-button');
-
-        // GANTI DENGAN URL WEB APP GOOGLE SCRIPT ANDA
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxyqT1DiJ_W02UGPqRQuvFq5n2xdJb0hoBIvH1OXLiuEMKLJxLEt9hktNys1OS73XkE9Q/exec'; 
+        const halamanSelesai = document.getElementById('halaman-selesai');
+        const soalContainer = document.getElementById('soal-container');
+        const namaInput = document.getElementById('nama');
+        const kelasInput = document.getElementById('kelas');
+        const konfirmasiModal = document.getElementById('konfirmasi-modal');
 
         let timerInterval;
-        let waktuSisa = 60 * 60; // 60 menit dalam detik
-        let hasLeftPage = false; // Flag untuk mencegah pengiriman berulang
+        let hasLeftPage = false;
 
-        function formatWaktu(detik) {
-            const menit = Math.floor(detik / 60);
-            const sisaDetik = detik % 60;
-            return `${menit.toString().padStart(2, '0')}:${sisaDetik.toString().padStart(2, '0')}`;
+        const soalKelasX = `
+            <div class="soal-paket">
+                <h3 class="text-lg font-semibold mb-4 border-b pb-2">A. Pilihan Ganda (Pilihlah jawaban yang paling tepat!)</h3>
+                <div class="space-y-6">
+                    <!-- Soal 1 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">1. Dalam Excel, pertemuan antara baris (row) dan kolom (column) disebut...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg1a" name="pg1" value="a"><label for="pg1a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. Range</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1b" name="pg1" value="b"><label for="pg1b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. Cell</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1c" name="pg1" value="c"><label for="pg1c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. Worksheet</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1d" name="pg1" value="d"><label for="pg1d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. Workbook</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 2 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">2. Kolom dalam Excel ditandai dengan...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg2a" name="pg2" value="a"><label for="pg2a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. Angka (1, 2, 3, …)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2b" name="pg2" value="b"><label for="pg2b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. Huruf (A, B, C, …)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2c" name="pg2" value="c"><label for="pg2c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. Simbol (*, #, @, …)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2d" name="pg2" value="d"><label for="pg2d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. Tanda kurung ((), {}, …)</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 3 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">3. Sekumpulan sel yang dipilih lebih dari satu disebut...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg3a" name="pg3" value="a"><label for="pg3a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. Range</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3b" name="pg3" value="b"><label for="pg3b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. Row</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3c" name="pg3" value="c"><label for="pg3c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. Column</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3d" name="pg3" value="d"><label for="pg3d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. Workbook</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 4 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">4. File Excel yang dapat berisi lebih dari satu lembar kerja disebut...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg4a" name="pg4" value="a"><label for="pg4a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. Worksheet</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4b" name="pg4" value="b"><label for="pg4b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. Workbook</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4c" name="pg4" value="c"><label for="pg4c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. Range</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4d" name="pg4" value="d"><label for="pg4d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. Formula</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 5 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">5. Rumus Excel untuk menjumlahkan data pada sel A1 sampai A10 adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg5a" name="pg5" value="a"><label for="pg5a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. =AVERAGE(A1:A10)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5b" name="pg5" value="b"><label for="pg5b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. =SUM(A1:A10)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5c" name="pg5" value="c"><label for="pg5c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. =MAX(A1:A10)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5d" name="pg5" value="d"><label for="pg5d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. =MIN(A1:A10)</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 6 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">6. Jika ingin mencari nilai rata-rata dari data pada sel B1 sampai B5, rumus yang benar adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg6a" name="pg6" value="a"><label for="pg6a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. =AVERAGE(B1:B5)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6b" name="pg6" value="b"><label for="pg6b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. =SUM(B1:B5)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6c" name="pg6" value="c"><label for="pg6c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. =MAX(B1:B5)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6d" name="pg6" value="d"><label for="pg6d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. =MIN(B1:B5)</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 7 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">7. Dalam berpikir komputasional, memecah masalah besar menjadi bagian-bagian kecil disebut...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg7a" name="pg7" value="a"><label for="pg7a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. Abstraksi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7b" name="pg7" value="b"><label for="pg7b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. Dekomposisi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7c" name="pg7" value="c"><label for="pg7c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. Algoritma</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7d" name="pg7" value="d"><label for="pg7d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. Pola</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 8 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">8. Mencari kesamaan atau perbedaan dari beberapa masalah untuk mempermudah penyelesaian disebut...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg8a" name="pg8" value="a"><label for="pg8a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. Dekomposisi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8b" name="pg8" value="b"><label for="pg8b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. Abstraksi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8c" name="pg8" value="c"><label for="pg8c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. Pengenalan Pola</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8d" name="pg8" value="d"><label for="pg8d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. Algoritma</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 9 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">9. Membuat langkah-langkah logis dan berurutan untuk menyelesaikan masalah merupakan penerapan konsep...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg9a" name="pg9" value="a"><label for="pg9a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. Abstraksi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9b" name="pg9" value="b"><label for="pg9b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. Dekomposisi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9c" name="pg9" value="c"><label for="pg9c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. Algoritma</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9d" name="pg9" value="d"><label for="pg9d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. Pengenalan Pola</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 10 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">10. Menyaring informasi penting dan mengabaikan hal yang tidak relevan dalam berpikir komputasional disebut...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg10a" name="pg10" value="a"><label for="pg10a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">a. Abstraksi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10b" name="pg10" value="b"><label for="pg10b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">b. Algoritma</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10c" name="pg10" value="c"><label for="pg10c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">c. Pengenalan Pola</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10d" name="pg10" value="d"><label for="pg10d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">d. Dekomposisi</label></div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4 border-b pb-2 mt-8">B. Uraian</h3>
+                <div class="space-y-6">
+                    <!-- Uraian 1 -->
+                    <div class="soal-item soal-uraian">
+                        <label for="uraian1" class="font-medium mb-3 block">1. Menurut pendapatmu, apa manfaat mempelajari Excel dalam kehidupan sehari-hari, baik di sekolah maupun di dunia kerja?</label>
+                        <textarea id="uraian1" name="uraian1" rows="4" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    <!-- Uraian 2 -->
+                    <div class="soal-item soal-uraian">
+                        <label for="uraian2" class="font-medium mb-3 block">2. Dari empat konsep berpikir komputasional (dekomposisi, pengenalan pola, abstraksi, algoritma), menurutmu konsep mana yang paling sering kamu gunakan dalam kehidupan sehari-hari? Berikan contoh nyata!</label>
+                        <textarea id="uraian2" name="uraian2" rows="4" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const soalKelasXI = `
+            <div class="soal-paket">
+                <h3 class="text-lg font-semibold mb-4 border-b pb-2">A. Pilihan Ganda (10 Soal)</h3>
+                <div class="space-y-6">
+                    <!-- Soal 1 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">1. Seorang siswa ingin menjumlahkan nilai ulangan dari sel B2 hingga B10 di Excel. Namun ia menggunakan formula =SUM(B2+B10) dan hasilnya tidak sesuai. Apa kesalahan yang dilakukan siswa tersebut?</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg1a" name="pg1" value="a"><label for="pg1a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Menggunakan operator tambah (+) di dalam fungsi SUM</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1b" name="pg1" value="b"><label for="pg1b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Menuliskan rumus pada sel yang salah</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1c" name="pg1" value="c"><label for="pg1c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Menggunakan huruf besar pada nama fungsi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1d" name="pg1" value="d"><label for="pg1d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Tidak memberi tanda sama dengan (=) di awal rumus</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 2 -->
+                     <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">2. Dalam sebuah worksheet terdapat 100 data nilai siswa. Jika ingin mencari nilai rata-rata tertinggi per kelas, maka langkah yang lebih efisien adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg2a" name="pg2" value="a"><label for="pg2a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Menghitung satu per satu menggunakan kalkulator</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2b" name="pg2" value="b"><label for="pg2b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Menggunakan fungsi =MAX() secara manual</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2c" name="pg2" value="c"><label for="pg2c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Menggunakan =AVERAGE() untuk setiap kelas lalu =MAX() dari hasil tersebut</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2d" name="pg2" value="d"><label for="pg2d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Menggunakan =SUM() lalu dibagi jumlah siswa</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 3 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">3. Seorang guru menjelaskan konsep row, column, dan cell dengan analogi "gedung bertingkat". Baris (row) diibaratkan sebagai lantai, kolom (column) sebagai lorong, dan cell sebagai kamar di dalamnya. Analogi ini membantu siswa memahami konsep...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg3a" name="pg3" value="a"><label for="pg3a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Cell, Row, Column</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3b" name="pg3" value="b"><label for="pg3b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Range, Formula, Workbook</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3c" name="pg3" value="c"><label for="pg3c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Worksheet, Row, Range</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3d" name="pg3" value="d"><label for="pg3d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Column, Formula, Worksheet</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 4 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">4. Dalam tahap pengembangan program, siswa diminta menggambar flowchart sebelum menulis kode. Hal ini dilakukan agar...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg4a" name="pg4" value="a"><label for="pg4a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Program dapat langsung diuji</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4b" name="pg4" value="b"><label for="pg4b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Solusi lebih mudah divisualisasikan sebelum diimplementasikan</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4c" name="pg4" value="c"><label for="pg4c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Dokumentasi bisa dibuat lebih cepat</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4d" name="pg4" value="d"><label for="pg4d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Program tidak perlu lagi diuji</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 5 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">5. Seorang siswa menulis program sederhana tetapi hasil output tidak sesuai harapan. Ia kemudian mencoba berbagai input untuk memastikan hasilnya benar. Tahapan yang sedang dilakukan adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg5a" name="pg5" value="a"><label for="pg5a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Coding</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5b" name="pg5" value="b"><label for="pg5b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Analyzing</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5c" name="pg5" value="c"><label for="pg5c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Testing</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5d" name="pg5" value="d"><label for="pg5d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Dokumentasi</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 6 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">6. Perhatikan rumus berikut di Excel: =AVERAGE(C2:C12). Rumus tersebut digunakan untuk menghitung...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg6a" name="pg6" value="a"><label for="pg6a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Jumlah semua nilai dari C2 sampai C12</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6b" name="pg6" value="b"><label for="pg6b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Nilai rata-rata dari C2 sampai C12</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6c" name="pg6" value="c"><label for="pg6c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Nilai tertinggi dari C2 sampai C12</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6d" name="pg6" value="d"><label for="pg6d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Nilai terendah dari C2 sampai C12</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 7 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">7. Jika data nilai ujian siswa berada di sel D5 sampai D30, guru ingin mengetahui nilai tertinggi. Rumus yang tepat adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg7a" name="pg7" value="a"><label for="pg7a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. =SUM(D5:D30)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7b" name="pg7" value="b"><label for="pg7b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. =MAX(D5:D30)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7c" name="pg7" value="c"><label for="pg7c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. =MIN(D5:D30)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7d" name="pg7" value="d"><label for="pg7d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. =AVERAGE(D5:D30)</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 8 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">8. Jika guru ingin mengetahui nilai terendah dari sekumpulan data pada range E2:E20, rumus yang digunakan adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg8a" name="pg8" value="a"><label for="pg8a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. =LOW(E2:E20)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8b" name="pg8" value="b"><label for="pg8b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. =MIN(E2:E20)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8c" name="pg8" value="c"><label for="pg8c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. =MAX(E2:E20)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8d" name="pg8" value="d"><label for="pg8d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. =AVERAGE(E2:E20)</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 9 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">9. Seorang siswa membuat flowchart untuk menghitung luas segitiga. Simbol jajar genjang miring dalam flowchart digunakan untuk...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg9a" name="pg9" value="a"><label for="pg9a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Proses perhitungan</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9b" name="pg9" value="b"><label for="pg9b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Input/Output data</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9c" name="pg9" value="c"><label for="pg9c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Keputusan (Decision)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9d" name="pg9" value="d"><label for="pg9d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Start/End</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 10 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">10. Flowchart menggambarkan alur: “Mulai → Input nilai → Jika nilai ≥ 75 maka Lulus, jika tidak maka Tidak Lulus → Selesai”. Simbol yang digunakan untuk mengecek kondisi tersebut adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg10a" name="pg10" value="a"><label for="pg10a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Simbol Proses</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10b" name="pg10" value="b"><label for="pg10b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Simbol Input/Output</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10c" name="pg10" value="c"><label for="pg10c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Simbol Decision (belah ketupat)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10d" name="pg10" value="d"><label for="pg10d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Simbol Terminator (Start/End)</label></div>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold mb-4 border-b pb-2 mt-8">B. Uraian (2 Soal)</h3>
+                 <div class="space-y-6">
+                    <!-- Uraian 1 -->
+                    <div class="soal-item soal-uraian">
+                        <label for="uraian1" class="font-medium mb-3 block">1. Sebutkan langkah-langkah pengembangan dalam membuat program!</label>
+                        <textarea id="uraian1" name="uraian1" rows="4" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    <!-- Uraian 2 -->
+                    <div class="soal-item soal-uraian">
+                        <label for="uraian2" class="font-medium mb-3 block">2. Sebutkan dan jelaskan secara singkat 2 jenis flowchart yang kamu ketahui!</label>
+                        <textarea id="uraian2" name="uraian2" rows="4" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        const soalKelasXII = `
+             <div class="soal-paket">
+                <h3 class="text-lg font-semibold mb-4 border-b pb-2">A. Pilihan Ganda (10 Soal)</h3>
+                <div class="space-y-6">
+                    <!-- Soal 1 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">1. Seorang siswa menulis data di dalam sel B3 pada Excel. Pernyataan yang tepat mengenai sel tersebut adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg1a" name="pg1" value="a"><label for="pg1a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Sel B3 berada di kolom B, baris ke-3</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1b" name="pg1" value="b"><label for="pg1b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Sel B3 berada di baris B, kolom ke-3</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1c" name="pg1" value="c"><label for="pg1c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Sel B3 adalah gabungan dari beberapa sel (range)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg1d" name="pg1" value="d"><label for="pg1d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Sel B3 adalah formula untuk menjumlahkan baris ke-3</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 2 -->
+                     <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">2. Jika seorang guru ingin menambahkan lembar kerja baru dalam file Excel untuk menyimpan data nilai, maka ia menambahkan...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg2a" name="pg2" value="a"><label for="pg2a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Column</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2b" name="pg2" value="b"><label for="pg2b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Row</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2c" name="pg2" value="c"><label for="pg2c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Cell</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg2d" name="pg2" value="d"><label for="pg2d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Worksheet</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 3 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">3. Seorang siswa mencatat nilai ujian di range C2:C11. Ia ingin mengetahui nilai rata-rata siswa. Rumus yang paling tepat digunakan adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg3a" name="pg3" value="a"><label for="pg3a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. =SUM(C2:C11)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3b" name="pg3" value="b"><label for="pg3b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. =AVERAGE(C2:C11)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3c" name="pg3" value="c"><label for="pg3c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. =MAX(C2:C11)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg3d" name="pg3" value="d"><label for="pg3d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. =MIN(C2:C11)</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 4 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">4. Seorang bendahara OSIS ingin mengetahui jumlah uang kas yang terkumpul dari A2:A20. Rumus Excel yang tepat digunakan adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg4a" name="pg4" value="a"><label for="pg4a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. =TOTAL(A2:A20)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4b" name="pg4" value="b"><label for="pg4b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. =COUNT(A2:A20)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4c" name="pg4" value="c"><label for="pg4c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. =MAX(A2:A20)</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg4d" name="pg4" value="d"><label for="pg4d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. =SUM(A2:A20)</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 5 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">5. Seorang siswa diminta membuat aplikasi penghitung rata-rata nilai. Jika menggunakan dekomposisi, maka langkah yang paling tepat adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg5a" name="pg5" value="a"><label for="pg5a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Membagi masalah menjadi: input nilai, proses perhitungan rata-rata, dan output hasil.</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5b" name="pg5" value="b"><label for="pg5b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Langsung menulis kode program.</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5c" name="pg5" value="c"><label for="pg5c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Menyalin formula dari internet.</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg5d" name="pg5" value="d"><label for="pg5d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Membuat flowchart tanpa memikirkan proses.</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 6 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">6. Seorang guru ingin membuat aplikasi untuk memantau absensi siswa. Pada tahap abstraksi, guru sebaiknya...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg6a" name="pg6" value="a"><label for="pg6a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Menyimpan semua detail siswa, termasuk warna baju yang dipakai setiap hari.</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6b" name="pg6" value="b"><label for="pg6b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Fokus pada informasi penting: nama siswa, tanggal hadir, dan status hadir/tidak.</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6c" name="pg6" value="c"><label for="pg6c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Menulis program tanpa desain.</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg6d" name="pg6" value="d"><label for="pg6d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Menguji program dengan data yang salah.</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 7 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">7. Jika seorang siswa ingin membuat langkah menghitung luas persegi panjang, algoritma yang benar adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg7a" name="pg7" value="a"><label for="pg7a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Input panjang → Input lebar → Hitung panjang × lebar → Output hasil</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7b" name="pg7" value="b"><label for="pg7b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Input panjang → Output hasil → Input lebar → Hitung panjang × lebar</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7c" name="pg7" value="c"><label for="pg7c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Hitung panjang × lebar → Input panjang → Input lebar → Output hasil</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg7d" name="pg7" value="d"><label for="pg7d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Output hasil → Input panjang → Input lebar → Hitung panjang × lebar</label></div>
+                        </div>
+                    </div>
+                     <!-- Soal 8 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">8. Arduino disebut mikrokontroler open-source karena...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg8a" name="pg8" value="a"><label for="pg8a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. Hanya bisa diprogram dengan bahasa Python</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8b" name="pg8" value="b"><label for="pg8b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. Kodenya tertutup sehingga tidak bisa dimodifikasi</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8c" name="pg8" value="c"><label for="pg8c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. Perangkat keras dan perangkat lunaknya dapat diakses dan dimodifikasi oleh siapa saja</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg8d" name="pg8" value="d"><label for="pg8d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. Tidak membutuhkan komputer untuk pemrograman</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 9 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">9. Jika sebuah LED terhubung ke pin 13 pada Arduino UNO, maka perintah yang digunakan untuk menyalakan LED adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg9a" name="pg9" value="a"><label for="pg9a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. digitalWrite(13, LOW);</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9b" name="pg9" value="b"><label for="pg9b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. digitalWrite(13, ON);</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9c" name="pg9" value="c"><label for="pg9c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. digitalWrite(13, HIGH);</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg9d" name="pg9" value="d"><label for="pg9d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. analogWrite(13, 255);</label></div>
+                        </div>
+                    </div>
+                    <!-- Soal 10 -->
+                    <div class="soal-item soal-pg">
+                        <p class="font-medium mb-3">10. Jika sebuah LED terhubung ke pin 11 pada Arduino UNO, maka perintah yang digunakan untuk mematikan LED adalah...</p>
+                        <div class="space-y-2">
+                            <div class="flex items-center"><input type="radio" id="pg10a" name="pg10" value="a"><label for="pg10a" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">A. digitalWrite(11, LOW);</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10b" name="pg10" value="b"><label for="pg10b" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">B. digitalWrite(11, ON);</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10c" name="pg10" value="c"><label for="pg10c" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">C. digitalWrite(11, HIGH);</label></div>
+                            <div class="flex items-center"><input type="radio" id="pg10d" name="pg10" value="d"><label for="pg10d" class="ml-2 p-2 border rounded-md w-full cursor-pointer hover:bg-gray-100">D. analogWrite(11, 255);</label></div>
+                        </div>
+                    </div>
+                </div>
+                <h3 class="text-lg font-semibold mb-4 border-b pb-2 mt-8">B. SOAL URAIAN (2 soal HOTS)</h3>
+                 <div class="space-y-6">
+                    <!-- Uraian 1 -->
+                    <div class="soal-item soal-uraian">
+                        <label for="uraian1" class="font-medium mb-3 block">1. Sebutkan dan jelaskan secara singkat tentang 4 Pondasi Berpikir Komputasional</label>
+                        <textarea id="uraian1" name="uraian1" rows="4" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                    <!-- Uraian 2 -->
+                    <div class="soal-item soal-uraian">
+                        <label for="uraian2" class="font-medium mb-3 block">2. Jika kamu pandai dalam mengoperasikan excel, projek apa yang ingin kamu kembangkan, (sebutkan 3 projek)</label>
+                        <textarea id="uraian2" name="uraian2" rows="4" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"></textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        function tampilkanKonfirmasi() {
+            if (namaInput.value.trim() === '' || kelasInput.value === '') {
+                alert('Nama dan Kelas harus diisi!');
+                return;
+            }
+            konfirmasiModal.classList.remove('hidden');
         }
 
-        function mulaiTimer() {
-            timerEl.textContent = formatWaktu(waktuSisa);
+        function mulaiUjian() {
+            konfirmasiModal.classList.add('hidden');
+            const nama = namaInput.value;
+            const kelas = kelasInput.value;
+
+            // Logika pemilihan soal
+            if (['X-1', 'X-2', 'X-3', 'X-4'].includes(kelas)) {
+                soalContainer.innerHTML = soalKelasX;
+            } else if (kelas === 'XI-2') {
+                soalContainer.innerHTML = soalKelasXI;
+            } else if (['XII-2', 'XII-4'].includes(kelas)) {
+                soalContainer.innerHTML = soalKelasXII;
+            } else {
+                alert('Kelas tidak valid atau tidak memiliki paket soal. Silakan coba lagi.');
+                return;
+            }
+
+            document.getElementById('info-siswa').innerText = `Nama: ${nama} | Kelas: ${kelas}`;
+            
+            halamanAwal.classList.add('hidden');
+            halamanUjian.classList.remove('hidden');
+            halamanUjian.classList.add('fade-in');
+
+            // Mulai Timer
+            let sisaWaktu = 60 * 60; // 60 menit
+            const timerDisplay = document.getElementById('timer');
+
             timerInterval = setInterval(() => {
-                waktuSisa--;
-                timerEl.textContent = formatWaktu(waktuSisa);
-                if (waktuSisa <= 0) {
-                    clearInterval(timerInterval);
-                    timerEl.textContent = "Waktu Habis!";
-                    timerEl.classList.add('animate-pulse');
-                    kirimJawaban(); // Otomatis kirim jika waktu habis
+                sisaWaktu--;
+                const menit = Math.floor(sisaWaktu / 60);
+                const detik = sisaWaktu % 60;
+                timerDisplay.textContent = `${menit.toString().padStart(2, '0')}:${detik.toString().padStart(2, '0')}`;
+
+                if (sisaWaktu < 0) {
+                    kirimJawaban(true); // Kirim paksa jika waktu habis
                 }
             }, 1000);
+
+            // Listener untuk mendeteksi pindah tab/halaman
+            document.addEventListener('visibilitychange', handleVisibilityChange);
         }
-
-        formSiswa.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const nama = document.getElementById('nama').value;
-            const kelas = document.getElementById('kelas').value;
-
-            if (nama && kelas) {
-                infoSiswaEl.textContent = `Nama: ${nama} | Kelas: ${kelas}`;
-                halamanAwal.classList.add('opacity-0');
-                setTimeout(() => {
-                    halamanAwal.classList.add('hidden');
-                    halamanUjian.classList.remove('hidden');
-                    halamanUjian.classList.add('opacity-100');
-                    mulaiTimer();
-                    // Tambahkan event listener untuk mendeteksi perpindahan tab/halaman
-                    document.addEventListener('visibilitychange', handleVisibilityChange);
-                }, 500);
-            }
-        });
 
         function handleVisibilityChange() {
-            // Fungsi ini akan berjalan jika siswa meninggalkan halaman
             if (document.hidden && !hasLeftPage) {
-                hasLeftPage = true; // Set flag agar fungsi tidak berjalan lagi
-                clearInterval(timerInterval); // Hentikan timer
-
-                // Ubah pesan konfirmasi menjadi pesan diskualifikasi
-                const h2Konfirmasi = document.querySelector('#halaman-konfirmasi h2');
-                const pKonfirmasi = document.getElementById('pesan-konfirmasi');
-                
-                h2Konfirmasi.textContent = "Ujian Dihentikan";
-                h2Konfirmasi.classList.remove('text-green-600');
-                h2Konfirmasi.classList.add('text-red-600');
-                pKonfirmasi.innerHTML = "Ujian dihentikan karena Anda meninggalkan halaman. Jawaban terakhir Anda telah dikirim secara otomatis.";
-
-                kirimJawaban(); // Langsung kirim jawaban
+                hasLeftPage = true;
+                kirimJawaban(true); // Kirim paksa jika pindah halaman
             }
         }
 
-        async function kirimJawaban() {
-             // Hapus listener agar tidak aktif di halaman konfirmasi
+        function kirimJawaban(paksa = false) {
+            clearInterval(timerInterval);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
-            
-             // Nonaktifkan tombol dan tampilkan status loading
-            submitButton.disabled = true;
-            submitButton.textContent = 'Mengirim...';
-            submitButton.classList.add('bg-gray-400', 'cursor-not-allowed');
 
-            const formData = new FormData(formUjian);
-            const nama = document.getElementById('nama').value;
-            const kelas = document.getElementById('kelas').value;
+            // --- VALIDASI JAWABAN KOSONG ---
+            if (!paksa) {
+                let semuaTerisi = true;
+                const visibleQuestions = soalContainer.querySelector('.soal-paket');
+                
+                // Cek semua Pilihan Ganda
+                const totalPG = visibleQuestions.querySelectorAll('.soal-pg').length;
+                for (let i = 1; i <= totalPG; i++) {
+                    const pilihan = document.querySelector(`input[name="pg${i}"]:checked`);
+                    if (!pilihan) {
+                        semuaTerisi = false;
+                        break;
+                    }
+                }
 
-            const data = {
-                timestamp: new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
-                nama: nama,
-                kelas: kelas,
-                jawaban1: formData.get('soal1') || "Tidak dijawab",
-                jawaban2: formData.get('soal2') || "Tidak dijawab",
-                jawaban3: formData.get('soal3') || "Tidak dijawab",
-                jawaban4: formData.get('soal4') || "Tidak dijawab",
-            };
-            
-            try {
-                // Jangan mengganti URL ini jika Anda belum punya URL dari Google Apps Script
-                if (SCRIPT_URL.includes('AKfycbwX')) {
-                     console.log('Data yang akan dikirim:', data);
-                     alert("Peringatan: URL Google Apps Script belum diganti. Data hanya akan ditampilkan di console dan tidak akan terkirim ke spreadsheet.");
-                } else {
-                     const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors', // Penting untuk menghindari error CORS
-                        cache: 'no-cache',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
+                // Cek semua Uraian
+                if (semuaTerisi) {
+                    const listSoalUraian = visibleQuestions.querySelectorAll('textarea');
+                    listSoalUraian.forEach(uraian => {
+                        if (uraian.value.trim() === '') {
+                            semuaTerisi = false;
+                        }
                     });
                 }
-                
-                // Tampilkan halaman konfirmasi
-                halamanUjian.classList.add('opacity-0');
-                setTimeout(() => {
-                    halamanUjian.classList.add('hidden');
-                    halamanKonfirmasi.classList.remove('hidden');
-                    halamanKonfirmasi.classList.add('opacity-100');
-                }, 500);
 
-
-            } catch (error) {
-                console.error('Error!', error.message);
-                alert('Terjadi kesalahan saat mengirim jawaban. Silakan coba lagi.');
-                // Aktifkan kembali tombol jika terjadi error
-                submitButton.disabled = false;
-                submitButton.textContent = 'Kirim Jawaban';
-                submitButton.classList.remove('bg-gray-400', 'cursor-not-allowed');
+                if (!semuaTerisi) {
+                    const notif = document.getElementById('notif-kosong');
+                    notif.classList.remove('hidden');
+                    notif.classList.remove('opacity-0');
+                    setTimeout(() => {
+                        notif.classList.add('opacity-0');
+                        // Sembunyikan elemen setelah transisi selesai
+                        setTimeout(()=> notif.classList.add('hidden'), 300);
+                    }, 3000);
+                    return; // Hentikan fungsi
+                }
             }
+            // --- AKHIR VALIDASI ---
+
+            const formData = {
+                timestamp: new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' }),
+                nama: namaInput.value,
+                kelas: kelasInput.value,
+            };
+
+            for(let i = 1; i <= 10; i++) {
+                const jawabanPG = document.querySelector(`input[name="pg${i}"]:checked`);
+                formData[`pg${i}`] = jawabanPG ? jawabanPG.value : '';
+            }
+
+            const jawabanUraian1 = document.querySelector('textarea[name="uraian1"]');
+            const jawabanUraian2 = document.querySelector('textarea[name="uraian2"]');
+            formData.uraian1 = jawabanUraian1 ? jawabanUraian1.value : '';
+            formData.uraian2 = jawabanUraian2 ? jawabanUraian2.value : '';
+            
+            fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(formData),
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+
+            // Tampilkan halaman selesai
+            halamanUjian.classList.add('hidden');
+            halamanSelesai.classList.remove('hidden');
+
+            // --- KONTEN HALAMAN SELESAI BARU ---
+            let pesanHTML = '';
+            if (paksa && hasLeftPage) {
+                pesanHTML = `
+                    <div class="bg-white rounded-xl shadow-xl p-8 text-center fade-in">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-100 mb-4">
+                            <svg class="h-8 w-8 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-900 mb-2">Ujian Dihentikan</h1>
+                        <p class="text-gray-600">Anda terdeteksi meninggalkan halaman ujian. Jawaban Anda yang sudah terisi telah dikirim secara otomatis.</p>
+                    </div>
+                `;
+            } else if (paksa) {
+                 pesanHTML = `
+                    <div class="bg-white rounded-xl shadow-xl p-8 text-center fade-in">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-orange-100 mb-4">
+                            <svg class="h-8 w-8 text-orange-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                               <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-900 mb-2">Waktu Habis!</h1>
+                        <p class="text-gray-600">Waktu pengerjaan telah berakhir. Jawaban Anda yang sudah terisi telah dikirim secara otomatis.</p>
+                    </div>
+                 `;
+            }
+             else {
+                pesanHTML = `
+                    <div class="bg-white rounded-xl shadow-xl p-8 text-center fade-in">
+                        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 mb-4">
+                            <svg class="h-8 w-8 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                            </svg>
+                        </div>
+                        <h1 class="text-2xl font-bold text-gray-900 mb-2">Jawaban Berhasil Dikirim!</h1>
+                        <p class="text-gray-600">Terima kasih telah menyelesaikan ujian. Silakan tunggu informasi selanjutnya dari guru Anda.</p>
+                    </div>
+                `;
+            }
+            halamanSelesai.innerHTML = pesanHTML;
         }
-
-        formUjian.addEventListener('submit', (e) => {
-            e.preventDefault();
-            clearInterval(timerInterval); // Hentikan timer saat submit manual
-            kirimJawaban();
-        });
-
     </script>
-
 </body>
 </html>
+
